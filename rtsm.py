@@ -36,30 +36,24 @@ except:
     print('No Trains')
     numberEnroute = 0
 
-print('Number of trains arriving: ' + str(numberEnroute))
+#print('Number of trains arriving: ' + str(numberEnroute))
 
-for train in stopData[0]['MonitoredStopVisit']:
-    lineName = train['MonitoredVehicleJourney']['LineRef']['Value']
-    print(CBOLD + str(lineName) + CEND, end='')
-    destination = train['MonitoredVehicleJourney']['DestinationName'][0]['Value']
-    print(' ' + CITALIC + 'to ' + CEND + CRED + CBOLD + str(destination) + CEND)
-    expectedArrivalTimeRAW = train['MonitoredVehicleJourney']['MonitoredCall']['AimedArrivalTime']
-    expectedArrivalTime = expectedArrivalTimeRAW[6:-7]
-    expectedArrivalTimeNice = time.strftime("%H:%M", time.localtime(int(expectedArrivalTime)/1000))
-    print(CITALIC + 'Scheduled for ' + CEND + CBLUE + str(expectedArrivalTimeNice) + CEND)
+if numberEnroute != 0:
+    for train in stopData[0]['MonitoredStopVisit']:
+        lineName = train['MonitoredVehicleJourney']['LineRef']['Value']
+        print(CBOLD + str(lineName) + CEND, end='')
+        destination = train['MonitoredVehicleJourney']['DestinationName'][0]['Value']
+        print(' ' + CITALIC + 'to ' + CEND + CRED + CBOLD + str(destination) + CEND)
+        expectedArrivalTimeRAW = train['MonitoredVehicleJourney']['MonitoredCall']['AimedArrivalTime']
+        expectedArrivalTime = expectedArrivalTimeRAW[6:-7]
+        expectedArrivalTimeNice = time.strftime("%H:%M", time.localtime(int(expectedArrivalTime)/1000))
+        print(CITALIC + 'Scheduled for ' + CEND + CBLUE + str(expectedArrivalTimeNice) + CEND)
 
-    latestArrivalTimeRAW = train['MonitoredVehicleJourney']['MonitoredCall']['LatestExpectedArrivalTime']
-    latestArrivalTime = latestArrivalTimeRAW[6:-7]
-    latestArrivalTimeNice = time.strftime("%H:%M", time.localtime(int(latestArrivalTime)/1000))
+        latestArrivalTimeRAW = train['MonitoredVehicleJourney']['MonitoredCall']['LatestExpectedArrivalTime']
+        latestArrivalTime = latestArrivalTimeRAW[6:-7]
+        latestArrivalTimeNice = time.strftime("%H:%M", time.localtime(int(latestArrivalTime)/1000))
 
-    if latestArrivalTime > expectedArrivalTime:
-        print(CITALIC + 'Arriving at ' + CEND + CSELECTED + CBLINK + CRED + str(latestArrivalTimeNice) + CEND + '\n')
-    else:
-        print(CITALIC + 'Arriving at ' + CEND + CSELECTED + CBLINK + CGREEN + str(latestArrivalTimeNice) + CEND + '\n')
-
-
-
-
-
-
-
+        if latestArrivalTime > expectedArrivalTime:
+            print(CITALIC + 'Arriving at ' + CEND + CSELECTED + CBLINK + CRED + str(latestArrivalTimeNice) + CEND + '\n')
+        else:
+            print(CITALIC + 'Arriving at ' + CEND + CSELECTED + CBLINK + CGREEN + str(latestArrivalTimeNice) + CEND + '\n')
