@@ -125,8 +125,8 @@ def main():
     lcd_init()
 
     ## TRAIN STUFF
-    #stopNumber = '16515'   # ETHELTON 
-    stopNumber = '16490'    # ADELAIDE
+    stopNumber = '16515'   # ETHELTON 
+    #stopNumber = '16490'    # ADELAIDE
 
     url = 'http://realtime.adelaidemetro.com.au/SiriWebServiceSAVM/SiriStopMonitoring.svc/json/SM?MonitoringRef=' + stopNumber
     response = requests.get(url)
@@ -136,38 +136,32 @@ def main():
     try:
         numberEnroute = len(stopData[0]['MonitoredStopVisit'])
     except:
-        #print('No Trains')
+        lcd_string("No Trains", LCD_LINE_2,2)
         numberEnroute = 0
 
-    #print('Number of trains arriving: ' + str(numberEnroute))
-
     if numberEnroute != 0:
-        for train in stopData[0]['MonitoredStopVisit']:
-            lineName = train['MonitoredVehicleJourney']['LineRef']['Value']
-            #print(CBOLD + str(lineName) + CEND, end='')
-            destination = train['MonitoredVehicleJourney']['DestinationName'][0]['Value']
-            #print(' ' + CITALIC + 'to ' + CEND + CRED + CBOLD + str(destination) + CEND)
-            expectedArrivalTimeRAW = train['MonitoredVehicleJourney']['MonitoredCall']['AimedArrivalTime']
-            expectedArrivalTime = expectedArrivalTimeRAW[6:-7]
-            expectedArrivalTimeNice = time.strftime("%H:%M", time.localtime(int(expectedArrivalTime)/1000))
-            #print(CITALIC + 'Scheduled for ' + CEND + CBLUE + str(expectedArrivalTimeNice) + CEND)
+        countdown = 20
+        while(countdown >= 0):
+            for train in stopData[0]['MonitoredStopVisit']:
+                lineName = train['MonitoredVehicleJourney']['LineRef']['Value']
+                destination = train['MonitoredVehicleJourney']['DestinationName'][0]['Value']
+                expectedArrivalTimeRAW = train['MonitoredVehicleJourney']['MonitoredCall']['AimedArrivalTime']
+                expectedArrivalTime = expectedArrivalTimeRAW[6:-7]
+                expectedArrivalTimeNice = time.strftime("%H:%M", time.localtime(int(expectedArrivalTime)/1000))
 
-            latestArrivalTimeRAW = train['MonitoredVehicleJourney']['MonitoredCall']['LatestExpectedArrivalTime']
-            latestArrivalTime = latestArrivalTimeRAW[6:-7]
-            latestArrivalTimeNice = time.strftime("%H:%M", time.localtime(int(latestArrivalTime)/1000))
+                latestArrivalTimeRAW = train['MonitoredVehicleJourney']['MonitoredCall']['LatestExpectedArrivalTime']
+                latestArrivalTime = latestArrivalTimeRAW[6:-7]
+                latestArrivalTimeNice = time.strftime("%H:%M", time.localtime(int(latestArrivalTime)/1000))
 
- #           if latestArrivalTime > expectedArrivalTime:
-                #print(CITALIC + 'Arriving at ' + CEND + CSELECTED + CBLINK + CRED + str(latestArrivalTimeNice) + CEND + '\n')
-  #          else:
-                #print(CITALIC + 'Arriving at ' + CEND + CSELECTED + CBLINK + CGREEN + str(latestArrivalTimeNice) + CEND + '\n')
-            lcd_string(str(lineName), LCD_LINE_1, 2)
-            lcd_string("To: " + str(destination),LCD_LINE_2,1)
-            lcd_string("Scheduled:     " + str(expectedArrivalTimeNice), LCD_LINE_3,1)
-            lcd_string("Arriving:      " + str(latestArrivalTimeNice), LCD_LINE_4, 1)
-            time.sleep(2)
-
-        while(True):
-                a = 1
+                lcd_string(str(lineName), LCD_LINE_1, 2)
+                lcd_string("To: " + str(destination),LCD_LINE_2,1)
+                lcd_string("Scheduled:     " + str(expectedArrivalTimeNice), LCD_LINE_3,1)
+                lcd_string("Arriving:      " + str(latestArrivalTimeNice), LCD_LINE_4, 1)
+                time.sleep(3)
+            countdown -= 1
+    else:
+        time.sleep(60)
+        main()
 
 if __name__ == '__main__':
      
