@@ -109,10 +109,7 @@ def lcd_backlight(flag):
     # Toggle backlight on-off-on
     GPIO.output(LED_ON, flag)
 
-def main():
-    print('Inside Main\n')
-    # Main program block
- 
+def setupLCD():
     GPIO.setmode(GPIO.BCM)       # Use BCM GPIO numbers
     GPIO.setup(LCD_E, GPIO.OUT)  # E
     GPIO.setup(LCD_RS, GPIO.OUT) # RS
@@ -125,6 +122,9 @@ def main():
     # Initialise display
     lcd_init()
 
+def main():
+    # Main program block
+
     ## TRAIN STUFF
     stopNumber = '16515'   # ETHELTON 
     #stopNumber = '16490'    # ADELAIDE
@@ -133,7 +133,6 @@ def main():
     response = requests.get(url)
     jsonData = response.json()
     stopData = jsonData['StopMonitoringDelivery']
-    print(stopData)
 
     try:
         numberEnroute = len(stopData[0]['MonitoredStopVisit'])
@@ -142,9 +141,8 @@ def main():
         numberEnroute = 0
 
     if numberEnroute != 0:
-        countdown = 20
+        countdown = 50
         while(countdown >= 0):
-            print('Countdown = ' + str(countdown))
             for train in stopData[0]['MonitoredStopVisit']:
                 lineName = train['MonitoredVehicleJourney']['LineRef']['Value']
                 destination = train['MonitoredVehicleJourney']['DestinationName'][0]['Value']
@@ -156,7 +154,9 @@ def main():
                 latestArrivalTime = latestArrivalTimeRAW[6:-7]
                 latestArrivalTimeNice = time.strftime("%H:%M", time.localtime(int(latestArrivalTime)/1000))
 
-                lcd_string(str(lineName), LCD_LINE_1, 2)
+                trainNum = train['MonitoredVehicleJourney']['VehicleRef'][0]['Value']
+
+                lcd_string(str(lineName) + '    ' + str(trainNum), LCD_LINE_1, 2)
                 lcd_string("To: " + str(destination),LCD_LINE_2,1)
                 lcd_string("Scheduled:     " + str(expectedArrivalTimeNice), LCD_LINE_3,1)
                 lcd_string("Arriving:      " + str(latestArrivalTimeNice), LCD_LINE_4, 1)
