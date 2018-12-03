@@ -110,6 +110,7 @@ def lcd_backlight(flag):
     GPIO.output(LED_ON, flag)
 
 def main():
+    print('Inside Main\n')
     # Main program block
  
     GPIO.setmode(GPIO.BCM)       # Use BCM GPIO numbers
@@ -132,6 +133,7 @@ def main():
     response = requests.get(url)
     jsonData = response.json()
     stopData = jsonData['StopMonitoringDelivery']
+    print(stopData)
 
     try:
         numberEnroute = len(stopData[0]['MonitoredStopVisit'])
@@ -142,6 +144,7 @@ def main():
     if numberEnroute != 0:
         countdown = 20
         while(countdown >= 0):
+            print('Countdown = ' + str(countdown))
             for train in stopData[0]['MonitoredStopVisit']:
                 lineName = train['MonitoredVehicleJourney']['LineRef']['Value']
                 destination = train['MonitoredVehicleJourney']['DestinationName'][0]['Value']
@@ -159,6 +162,7 @@ def main():
                 lcd_string("Arriving:      " + str(latestArrivalTimeNice), LCD_LINE_4, 1)
                 time.sleep(3)
             countdown -= 1
+        main()
     else:
         time.sleep(60)
         main()
