@@ -33,21 +33,21 @@ arrivingLabel = Label(window, text = "Init arriving")
 
 # Radio Buttons to Select Stop
 def changedStopSelection():
-    makeRequest(stopSelected.get())
-    
-stopSelected = IntVar()
+    makeRequest(stopSelected)
+
+stopSelected = 16515
 rad_ethelton = Radiobutton(window, text = "Ethelton", value=16515, variable=stopSelected, command=changedStopSelection)
 rad_adelaide = Radiobutton(window, text = "Adelaide", value=16490, variable=stopSelected, command=changedStopSelection)
 
 # Make Request To Server
-def makeRequest(stopNumber):
+def makeRequest(stopSelected):
     print("Making Request")
-    url = 'http://realtime.adelaidemetro.com.au/SiriWebServiceSAVM/SiriStopMonitoring.svc/json/SM?MonitoringRef=' + str(stopNumber)
-    response = requests.get(url)
+    url = 'http://realtime.adelaidemetro.com.au/SiriWebServiceSAVM/SiriStopMonitoring.svc/json/SM?MonitoringRef=' + str(stopSelected)
+    response = requests.get(url, timeout=1) # Have to set this timeout otherwise just hangs forever
     jsonData = response.json()
     print("Response: \n" + str(jsonData))
     stopData = jsonData['StopMonitoringDelivery']
-    updateLabels(stopData)
+    updateTheLabels(stopData)
 
 # Train Information Storage Setup
 trainInfo = {
@@ -63,10 +63,10 @@ def updateTrainInfo(train):
     trainInfo["lineName"] = str(train['MonitoredVehicleJourney']['LineRef']['Value'])
     trainInfo["destination"] = str(train['MonitoredVehicleJourney']['DestinationName'][0]['Value'])
     trainInfo["scheduled"] = str(time.strftime("%H:%M", time.localtime(int((train['MonitoredVehicleJourney']['MonitoredCall']['AimedArrivalTime'])[6:-7])/1000)))
-    trainInfo["actual"] = str(time.strftime("%H:%M", time.localtime(int((train['MonitoredVehicleJourney']['MonitoredCall']['LatestExpectedArrivalTime'])[6:-7]/1000))))
+    trainInfo["actual"] = str(time.strftime("%H:%M", time.localtime(int((train['MonitoredVehicleJourney']['MonitoredCall']['LatestExpectedArrivalTime'])[6:-7])/1000)))
 
 # Update Labels on Screen
-def updateTheLabels(stopData)
+def updateTheLabels(stopData):
     print("Updating Labels")
     lastStopData = stopData
 
@@ -82,10 +82,10 @@ def updateTheLabels(stopData)
             updateTrainInfo(train)
             time.sleep(5)
         time.sleep(30)
-        makeRequest()
+        makeRequest(stopSelected)
     else:
         time.sleep(120)
-        makeRequest()
+        makeRequest(stopSelected)
 
 #Layout
 Title.grid(column=1, row=0)
